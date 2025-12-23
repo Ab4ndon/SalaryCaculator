@@ -1,0 +1,5 @@
+{
+  "name": "China Salary Calculator",
+  "description": "A comprehensive salary calculator for China, computing net income, individual income tax, and social insurance deductions based on the cumulative tax withholding method.",
+  "requestFramePermissions": []
+}
