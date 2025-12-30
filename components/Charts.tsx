@@ -9,12 +9,13 @@ interface ChartsProps {
 const RADIAN = Math.PI / 180;
 
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
-  // Put label in the middle of the ring
+  // 计算圆环正中心的位置
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-  if (percent < 0.03) return null; // Don't show labels for tiny slices
+  // 占比太小时不显示标签，避免重叠
+  if (percent < 0.03) return null;
 
   return (
     <text 
@@ -24,7 +25,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
       textAnchor="middle" 
       dominantBaseline="central" 
       className="text-sm font-bold pointer-events-none"
-      style={{ filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.3))' }}
+      style={{ filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.5))' }}
     >
       {`${(percent * 100).toFixed(0)}%`}
     </text>
@@ -33,46 +34,53 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
 export const Charts: React.FC<ChartsProps> = ({ yearly }) => {
   const data = [
-    { name: '到手收入', value: yearly.totalNet, color: '#10B981' }, // Emerald
-    { name: '个人个税', value: yearly.totalTax, color: '#EF4444' }, // Red
-    { name: '五险一金', value: yearly.totalSocial, color: '#F59E0B' }, // Amber
+    { name: '到手收入', value: yearly.totalNet, color: '#10B981' }, // 翠绿色
+    { name: '个人个税', value: yearly.totalTax, color: '#EF4444' }, // 红色
+    { name: '五险一金', value: yearly.totalSocial, color: '#F59E0B' }, // 琥珀色
   ];
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6 flex flex-col items-center">
-      <h3 className="text-lg font-bold text-gray-800 mb-2 w-full text-left border-l-4 border-indigo-500 pl-3">全年收入去向分布</h3>
+      <div className="flex items-center w-full mb-2">
+        <div className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></div>
+        <h3 className="text-lg font-bold text-gray-800">全年收入去向分布</h3>
+      </div>
       
-      {/* Container height increased to h-80 (320px) to prevent clipping of the thicker ring */}
-      <div className="w-full h-80 relative">
+      {/* 进一步增加高度至 h-96 (384px)，彻底解决截断问题 */}
+      <div className="w-full h-96 relative">
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart margin={{ top: 20, right: 10, bottom: 20, left: 10 }}>
+          <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
               labelLine={false}
               label={renderCustomizedLabel}
-              innerRadius={65}  // Thicker ring
-              outerRadius={115} // Thicker ring, fits safely within 320px height
-              paddingAngle={2}
+              innerRadius={70}  // 增加内径，使圆环更宽厚
+              outerRadius={125} // 增加外径，填充空间
+              paddingAngle={3}
               dataKey="value"
-              animationDuration={1000}
+              animationBegin={0}
+              animationDuration={800}
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} stroke="white" strokeWidth={2} />
+                <Cell key={`cell-${index}`} fill={entry.color} stroke="#fff" strokeWidth={3} />
               ))}
             </Pie>
             <Tooltip 
-              formatter={(value: number) => `¥${value.toLocaleString()}`}
+              formatter={(value: number) => `¥${value.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`}
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
             />
-            <Legend verticalAlign="bottom" height={36} iconType="circle" />
+            <Legend verticalAlign="bottom" height={40} iconType="circle" />
           </PieChart>
         </ResponsiveContainer>
       </div>
       
-      <div className="text-xs text-gray-400 mt-4 bg-gray-50 px-4 py-2 rounded-full border border-gray-100 italic">
-        * 计算基数 (税前总收入): ¥{yearly.totalGross.toLocaleString()}
+      <div className="mt-4 w-full bg-gray-50 p-3 rounded-lg border border-gray-100">
+        <div className="flex justify-between text-xs text-gray-500">
+          <span>* 税前总收入统计基数:</span>
+          <span className="font-mono font-bold text-gray-700">¥{yearly.totalGross.toLocaleString()}</span>
+        </div>
       </div>
     </div>
   );
