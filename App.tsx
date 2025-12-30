@@ -1,73 +1,52 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SalaryInputs, CalculationResult } from './types';
 import { calculateSalary } from './utils/taxCalculator';
 import { InputCard } from './components/InputCard';
 import { SummaryCards } from './components/SummaryCards';
 import { Charts } from './components/Charts';
 import { ResultsTable } from './components/ResultsTable';
-import { loadInputsFromStorage, saveInputsToStorage } from './utils/storage';
-
-// 默认输入值
-const DEFAULT_INPUTS: SalaryInputs = {
-  monthlySalary: 34000,
-  baseMonths: 12,
-  bonusMonths: 3, // 15 salary total -> 12 base + 3 bonus
-  
-  // Default Ratios
-  housingFundRatio: 12,
-  pensionRatio: 8,
-  medicalRatio: 2,
-  unemploymentRatio: 0.5,
-  
-  specialAdditionalDeduction: 1500,
-  bonusTaxMethod: 'separate'
-};
 
 const App: React.FC = () => {
-  // 从 localStorage 加载保存的输入，如果没有则使用默认值
-  const [inputs, setInputs] = useState<SalaryInputs>(() => {
-    const saved = loadInputsFromStorage();
-    return saved || DEFAULT_INPUTS;
+  // Default State matching the user's example
+  const [inputs, setInputs] = useState<SalaryInputs>({
+    monthlySalary: 34000,
+    baseMonths: 12,
+    bonusMonths: 3, // 15 salary total -> 12 base + 3 bonus
+    
+    // Default Ratios
+    housingFundRatio: 12,
+    pensionRatio: 8,
+    medicalRatio: 2,
+    unemploymentRatio: 0.5,
+    
+    specialAdditionalDeduction: 1500,
+    bonusTaxMethod: 'separate'
   });
 
   const [result, setResult] = useState<CalculationResult | null>(null);
 
-  // 使用 useMemo 优化计算性能
-  const calcResult = useMemo(() => {
-    try {
-      return calculateSalary(inputs);
-    } catch (error) {
-      console.error('计算薪资时出错:', error);
-      return null;
-    }
-  }, [inputs]);
-
   useEffect(() => {
+    const calcResult = calculateSalary(inputs);
     setResult(calcResult);
-  }, [calcResult]);
-
-  // 保存输入到 localStorage
-  useEffect(() => {
-    saveInputsToStorage(inputs);
   }, [inputs]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <header className="mb-8 text-center">
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
-            中国薪资计算器
+            薪资计算器
           </h1>
           <p className="mt-2 text-lg text-gray-600">
-            Based on 2019 Individual Income Tax Law (Cumulative Withholding)
+            基于2019年个人所得税法（累计预扣法）
           </p>
         </header>
 
         <main>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
             
             {/* Left Column: Inputs & Charts */}
-            <div className="lg:col-span-5 space-y-6">
+            <div className="xl:col-span-5 space-y-6">
               <InputCard inputs={inputs} setInputs={setInputs} />
               {result && <Charts yearly={result.yearly} />}
               
@@ -92,7 +71,7 @@ const App: React.FC = () => {
             </div>
 
             {/* Right Column: Results */}
-            <div className="lg:col-span-7 space-y-6">
+            <div className="xl:col-span-7 space-y-6">
               {result && (
                 <>
                   <SummaryCards yearly={result.yearly} comparison={result.comparison} />
@@ -105,7 +84,7 @@ const App: React.FC = () => {
         </main>
 
         <footer className="mt-12 text-center text-sm text-gray-500 pb-8">
-          <p>© {new Date().getFullYear()} China Salary Calculator. Calculations are estimates.</p>
+          <p>© {new Date().getFullYear()} 薪资计算器。计算结果仅供参考。</p>
         </footer>
       </div>
     </div>

@@ -3,7 +3,6 @@ import { SalaryInputs } from '../types';
 import { ReferenceTables } from './ReferenceTables';
 import { TaxMethodExplanation } from './TaxMethodExplanation';
 import { DeductionExplanation } from './DeductionExplanation';
-import { normalizeInput, validateSalaryInputs } from '../utils/validation';
 
 interface InputCardProps {
   inputs: SalaryInputs;
@@ -14,40 +13,13 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
   const [showRefModal, setShowRefModal] = useState(false);
   const [showMethodModal, setShowMethodModal] = useState(false);
   const [showDeductionModal, setShowDeductionModal] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numValue = parseFloat(value);
-    
-    // 如果输入为空或无效，允许为空（不立即设为0）
-    if (value === '' || isNaN(numValue)) {
-      setInputs(prev => ({
-        ...prev,
-        [name]: 0
-      }));
-      return;
-    }
-
-    // 规范化输入值
-    const normalizedValue = normalizeInput(name as keyof SalaryInputs, numValue);
-    
-    setInputs(prev => {
-      const newInputs = {
-        ...prev,
-        [name]: normalizedValue
-      };
-      
-      // 验证输入
-      const validationErrors = validateSalaryInputs(newInputs);
-      const errorMap: Record<string, string> = {};
-      validationErrors.forEach(err => {
-        errorMap[err.field] = err.message;
-      });
-      setErrors(errorMap);
-      
-      return newInputs;
-    });
+    setInputs(prev => ({
+      ...prev,
+      [name]: parseFloat(value) || 0
+    }));
   };
 
   const handleMethodChange = (method: 'separate' | 'combined') => {
@@ -58,6 +30,13 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
   };
 
   const totalSocialRatio = inputs.housingFundRatio + inputs.pensionRatio + inputs.medicalRatio + inputs.unemploymentRatio;
+
+  // Shared icon style for consistency - Outline Question Mark Circle
+  const HelpIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6 relative">
@@ -76,10 +55,8 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
           onClick={() => setShowRefModal(true)}
           className="text-sm text-indigo-600 hover:text-indigo-800 flex items-center font-medium bg-indigo-50 px-3 py-1 rounded-full transition-colors"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          查看参考税率
+          <HelpIcon />
+          <span className="ml-1">查看参考税率</span>
         </button>
       </div>
 
@@ -98,15 +75,10 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                 <input
                   type="number"
                   name="monthlySalary"
-                  value={inputs.monthlySalary || ''}
+                  value={inputs.monthlySalary}
                   onChange={handleChange}
-                  className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md py-2 border ${
-                    errors.monthlySalary ? 'border-red-500' : ''
-                  }`}
+                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md py-2 border"
                 />
-                {errors.monthlySalary && (
-                  <p className="mt-1 text-xs text-red-600">{errors.monthlySalary}</p>
-                )}
               </div>
             </div>
             <div>
@@ -197,9 +169,7 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                   className="text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none"
                   title="查看扣除项说明"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <HelpIcon />
                 </button>
               </div>
               <div className="relative rounded-md shadow-sm">
@@ -244,9 +214,7 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                   className="text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none"
                   title="点击查看计税方式说明"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
+                  <HelpIcon />
                 </button>
               </div>
               

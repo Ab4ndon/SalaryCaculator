@@ -1,29 +1,41 @@
 import { CalculationResult, SalaryInputs, BonusTaxMethod } from '../types';
-import { TAX_THRESHOLD, TAX_BRACKETS, BONUS_TAX_BRACKETS } from './constants';
-import { calculateSocialBase } from './validation';
+
+const TAX_THRESHOLD = 5000;
 
 // Helper to get tax rate based on taxable income
 const getTaxRate = (taxable: number): number => {
   if (taxable <= 0) return 0;
-  const bracket = TAX_BRACKETS.find((b) => taxable <= b.max);
-  return bracket?.rate ?? 0.45;
+  if (taxable <= 36000) return 0.03;
+  if (taxable <= 144000) return 0.10;
+  if (taxable <= 300000) return 0.20;
+  if (taxable <= 420000) return 0.25;
+  if (taxable <= 660000) return 0.30;
+  if (taxable <= 960000) return 0.35;
+  return 0.45;
 };
 
 // 综合所得累计税率表 (2019版) - Calculates Tax Amount
 const calcTax = (taxable: number): number => {
   if (taxable <= 0) return 0;
-  const bracket = TAX_BRACKETS.find((b) => taxable <= b.max);
-  if (!bracket) return taxable * 0.45 - 181920;
-  return taxable * bracket.rate - bracket.deduction;
+  if (taxable <= 36000) return taxable * 0.03;
+  if (taxable <= 144000) return taxable * 0.10 - 2520;
+  if (taxable <= 300000) return taxable * 0.20 - 16920;
+  if (taxable <= 420000) return taxable * 0.25 - 31920;
+  if (taxable <= 660000) return taxable * 0.30 - 52920;
+  if (taxable <= 960000) return taxable * 0.35 - 85920;
+  return taxable * 0.45 - 181920;
 };
 
 // 标准年终奖计算方法 (单独计税)：奖金 * 适用税率 - 速算扣除数
 const getBonusTaxSeparate = (totalBonus: number): number => {
-  if (totalBonus <= 0) return 0;
   const avg = totalBonus / 12.0;
-  const bracket = BONUS_TAX_BRACKETS.find((b) => avg <= b.max);
-  if (!bracket) return totalBonus * 0.45 - 15160;
-  return totalBonus * bracket.rate - bracket.deduction;
+  if (avg <= 3000) return totalBonus * 0.03 - 0;
+  if (avg <= 12000) return totalBonus * 0.10 - 210;
+  if (avg <= 25000) return totalBonus * 0.20 - 1410;
+  if (avg <= 35000) return totalBonus * 0.25 - 2660;
+  if (avg <= 55000) return totalBonus * 0.30 - 4410;
+  if (avg <= 80000) return totalBonus * 0.35 - 7160;
+  return totalBonus * 0.45 - 15160;
 };
 
 export const calculateSalary = (inputs: SalaryInputs): CalculationResult => {
@@ -44,13 +56,10 @@ export const calculateSalary = (inputs: SalaryInputs): CalculationResult => {
   let cumulativeTaxPaid = 0;
   let totalNetIncomeSalaryPart = 0;
   
-  // Calculate actual social security base (considering min/max limits)
-  const socialBase = calculateSocialBase(monthlySalary);
-  
   // Calculate total individual deduction ratio
   const totalRatio = housingFundRatio + pensionRatio + medicalRatio + unemploymentRatio;
-  const monthlyPersonalDed = socialBase * (totalRatio / 100.0);
-  const monthlyHousingFundOnly = socialBase * (housingFundRatio / 100.0);
+  const monthlyPersonalDed = monthlySalary * (totalRatio / 100.0);
+  const monthlyHousingFundOnly = monthlySalary * (housingFundRatio / 100.0);
 
   const monthlyData = [];
 
