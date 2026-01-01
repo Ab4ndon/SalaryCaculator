@@ -18,9 +18,11 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    // If value is empty, set to 0 to show placeholder
+    const numValue = value === '' ? 0 : parseFloat(value);
     setInputs(prev => ({
       ...prev,
-      [name]: parseFloat(value) || 0
+      [name]: isNaN(numValue) ? 0 : numValue
     }));
   };
 
@@ -77,9 +79,10 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                 <input
                   type="number"
                   name="monthlySalary"
-                  value={inputs.monthlySalary}
+                  value={inputs.monthlySalary > 0 ? inputs.monthlySalary : ''}
                   onChange={handleChange}
-                  className="glass-input block w-full pl-8 pr-4 sm:text-sm rounded-lg py-2.5"
+                  placeholder="30000"
+                  className="glass-input block w-full pl-8 pr-4 sm:text-sm rounded-lg py-2.5 placeholder:text-gray-400"
                 />
               </div>
             </div>
@@ -90,7 +93,8 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                 name="baseMonths"
                 value={inputs.baseMonths}
                 onChange={handleChange}
-                className="glass-input block w-full sm:text-sm rounded-lg py-2.5 px-4"
+                placeholder="12"
+                className="glass-input block w-full sm:text-sm rounded-lg py-2.5 px-4 placeholder:text-gray-400"
               />
             </div>
           </div>
@@ -115,7 +119,7 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                 </svg>
                 公积金
               </label>
-              <input type="number" name="housingFundRatio" value={inputs.housingFundRatio} onChange={handleChange} step="0.1" className="glass-input block w-full text-sm rounded-lg py-2 px-2" />
+              <input type="number" name="housingFundRatio" value={inputs.housingFundRatio} onChange={handleChange} step="0.1" placeholder="12" className="glass-input block w-full text-sm rounded-lg py-2 px-2 placeholder:text-gray-400" />
             </div>
             <div>
               <label className="flex items-center text-xs font-bold text-gray-600 mb-1">
@@ -124,7 +128,7 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                 </svg>
                 养老
               </label>
-              <input type="number" name="pensionRatio" value={inputs.pensionRatio} onChange={handleChange} step="0.1" className="glass-input block w-full text-sm rounded-lg py-2 px-2" />
+              <input type="number" name="pensionRatio" value={inputs.pensionRatio} onChange={handleChange} step="0.1" placeholder="8" className="glass-input block w-full text-sm rounded-lg py-2 px-2 placeholder:text-gray-400" />
             </div>
             <div>
               <label className="flex items-center text-xs font-bold text-gray-600 mb-1">
@@ -133,7 +137,7 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                 </svg>
                 医疗
               </label>
-              <input type="number" name="medicalRatio" value={inputs.medicalRatio} onChange={handleChange} step="0.1" className="glass-input block w-full text-sm rounded-lg py-2 px-2" />
+              <input type="number" name="medicalRatio" value={inputs.medicalRatio} onChange={handleChange} step="0.1" placeholder="2" className="glass-input block w-full text-sm rounded-lg py-2 px-2 placeholder:text-gray-400" />
             </div>
             <div>
               <label className="flex items-center text-xs font-bold text-gray-600 mb-1">
@@ -142,7 +146,7 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                 </svg>
                 失业
               </label>
-              <input type="number" name="unemploymentRatio" value={inputs.unemploymentRatio} onChange={handleChange} step="0.1" className="glass-input block w-full text-sm rounded-lg py-2 px-2" />
+              <input type="number" name="unemploymentRatio" value={inputs.unemploymentRatio} onChange={handleChange} step="0.1" placeholder="0.5" className="glass-input block w-full text-sm rounded-lg py-2 px-2 placeholder:text-gray-400" />
             </div>
           </div>
         </div>
@@ -157,11 +161,11 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                   <HelpIcon />
                 </button>
               </div>
-              <input type="number" name="specialAdditionalDeduction" value={inputs.specialAdditionalDeduction} onChange={handleChange} className="glass-input block w-full text-sm rounded-lg py-2.5 px-4" />
+              <input type="number" name="specialAdditionalDeduction" value={inputs.specialAdditionalDeduction} onChange={handleChange} placeholder="1500" className="glass-input block w-full text-sm rounded-lg py-2.5 px-4 placeholder:text-gray-400" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">年终奖月数</label>
-              <input type="number" name="bonusMonths" value={inputs.bonusMonths} onChange={handleChange} step="0.1" className="glass-input block w-full text-sm rounded-lg py-2.5 px-4" />
+              <input type="number" name="bonusMonths" value={inputs.bonusMonths} onChange={handleChange} step="0.1" placeholder="3" className="glass-input block w-full text-sm rounded-lg py-2.5 px-4 placeholder:text-gray-400" />
             </div>
             <div className="md:col-span-2">
               <div className="flex items-center mb-3">
