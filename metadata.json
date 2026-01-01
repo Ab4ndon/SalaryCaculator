@@ -1,0 +1,5 @@
+{
+  "name": "薪资计算器",
+  "description": "一款全面的中国薪资计算器，基于累计预扣法计算到手收入、个人所得税及五险一金扣除。",
+  "requestFramePermissions": []
+}
