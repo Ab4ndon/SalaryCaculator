@@ -114,6 +114,11 @@ const App: React.FC = () => {
 
         <footer className="mt-12 text-center text-sm text-gray-600 pb-8">
           <p className="glass-effect inline-block px-6 py-3 rounded-full">© {new Date().getFullYear()} 薪资计算器。计算结果仅供参考。</p>
+          <p className="mt-4 text-xs text-gray-500">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700">
+              苏ICP备2020057407号-2
+            </a>
+          </p>
         </footer>
       </div>
     </div>
