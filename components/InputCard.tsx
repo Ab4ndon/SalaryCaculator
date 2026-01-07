@@ -81,6 +81,7 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
                   name="monthlySalary"
                   value={inputs.monthlySalary > 0 ? inputs.monthlySalary : ''}
                   onChange={handleChange}
+                  step="1000"
                   placeholder="30000"
                   className="glass-input block w-full pl-8 pr-4 sm:text-sm rounded-lg py-2.5 placeholder:text-gray-400"
                 />
@@ -165,7 +166,7 @@ export const InputCard: React.FC<InputCardProps> = ({ inputs, setInputs }) => {
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">年终奖月数</label>
-              <input type="number" name="bonusMonths" value={inputs.bonusMonths} onChange={handleChange} step="0.1" placeholder="3" className="glass-input block w-full text-sm rounded-lg py-2.5 px-4 placeholder:text-gray-400" />
+              <input type="number" name="bonusMonths" value={inputs.bonusMonths} onChange={handleChange} step="0.5" placeholder="3" className="glass-input block w-full text-sm rounded-lg py-2.5 px-4 placeholder:text-gray-400" />
             </div>
             <div className="md:col-span-2">
               <div className="flex items-center mb-3">
